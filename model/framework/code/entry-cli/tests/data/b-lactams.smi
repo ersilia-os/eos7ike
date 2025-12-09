@@ -1,4 +1,3 @@
-smiles
 O=C(O)[C@@H]2N3C(=O)[C@@H](NC(=O)[C@@H](c1ccccc1)N)[C@H]3SC2(C)C
 CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)Cc3ccccc3)C(=O)O)C
 O=C3N2\C(=C(\S[C@H]1C[C@@H](C(=O)N(C)C)NC1)[C@H](C)[C@@H]2[C@H]3[C@H](O)C)C(=O)O

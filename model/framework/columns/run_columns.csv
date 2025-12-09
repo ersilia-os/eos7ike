@@ -1,1 +1,4 @@
 name,type,direction,description
+rb,integer,high,Low flexibility (rotatable bonds lower or equal than 5)
+glob,integer,high,Low globularity (lower or equal than 0.25)
+primary_amine,integer,high,Determines if a molecule has a primary amine

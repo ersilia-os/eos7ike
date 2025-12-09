@@ -1,0 +1,11 @@
+name: entry-cli-env
+channels:
+  - rdkit
+  - conda-forge
+  - defaults
+dependencies:
+- python
+- numpy
+- nose
+- openbabel=3.1.1
+- rdkit=2019.03.4.0

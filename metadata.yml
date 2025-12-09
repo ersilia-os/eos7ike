@@ -1,47 +1,38 @@
 Identifier: eos7ike
-Slug: entry-way
+Slug: entry-rules
 Status: In progress
-Title: Entry-way rules for gram-negative bacteria
-Description: Most small molecules are unable to rapidly traverse the outer membrane
-  of Gram-negative bacteria and accumulate inside these cells, making the discovery
-  of much-needed drugs against these pathogens challenging. Here we assess the ability
-  of over 180 diverse compounds to accumulate in Escherichia coli. Computational analysis
-  of the results reveals major differences from the retrospective studies, namely
-  that the small molecules that are most likely to accumulate contain an amine, are
-  amphiphilic and rigid, and have low globularity.
+Title: Entry-way rules (eNTRy) for gram-negative bacteria
+Description: |
+  The eNTRy rules are a set of three simple criteria for predicting compound accumulation in gram-negative bacteria.
+  These rules were derived from a large dataset of compound accumulation in Escherichia coli and have been shown
+  to be effective in guiding the design of compounds with improved permeability and accumulation in gram-negative bacteria.
+  The eNTRy rules state that compounds are more likely to accumulate in gram-negative bacteria if they possess the following
+  properties: (1) a low globularity (≤ 0.25), (2) a low number of rotatable bonds (≤ 5), and (3) the presence of a primary amine group.
 Deployment:
-- Local
-- Online
-Source: Local, Online
-Source Type: Internal, Replicated, External
-Task: Annotation, Representation, Sampling
-Subtask: Property calculation or prediction, Activity prediction, Featurization, Projection,
-  Similarity search, Generation
+  - Local
+Source: Local
+Source Type: External
+Task: Annotation
+Subtask: Activity prediction
 Input:
-- Compound
+  - Compound
 Input Dimension: 1
 Output:
-- Value
-- Score
-- Compound
-- Probability
-- Experimental value
-- '...'
-Output Dimension: 1
-Output Consistency: Fixed, Variable
-Interpretation: 'The output of this template model should be interpreted like this.
-
-  '
+  - Score
+Output Dimension: 3
+Output Consistency: Fixed
+Interpretation: |
+  Three binary outputs indicating whether the compound meets each of the eNTRy rules, namely low globularity,
+  low number of rotatable bonds, and presence of a primary amine group. A value of 1 indicates that the compound
+  meets the respective criterion, while a value of 0 indicates that it does not.
 Tag:
-- Antimicrobial activity
+  - Antimicrobial activity
 Biomedical Area:
-- Biomedical Area 1
-- Biomedical Area 2
+  - Antimicrobial resistance
 Target Organism:
-- Target Organism 1
-- Target Organism 2
-Publication Type: Peer reviewed, Preprint, Other
-Publication Year: 2025
+  - Escherichia coli
+Publication Type: Peer reviewed
+Publication Year: 2017
 Publication: https://www.nature.com/articles/nature22308
 Source Code: https://github.com/HergenrotherLab/entry-cli
 License: GPL-3.0-or-later
