@@ -2,12 +2,14 @@ Identifier: eos7ike
 Slug: entry-rules
 Status: In progress
 Title: Entry-way rules (eNTRy) for gram-negative bacteria
-Description: |
-  The eNTRy rules are a set of three simple criteria for predicting compound accumulation in gram-negative bacteria.
-  These rules were derived from a large dataset of compound accumulation in Escherichia coli and have been shown
-  to be effective in guiding the design of compounds with improved permeability and accumulation in gram-negative bacteria.
-  The eNTRy rules state that compounds are more likely to accumulate in gram-negative bacteria if they possess the following
-  properties: (1) a low globularity (≤ 0.25), (2) a low number of rotatable bonds (≤ 5), and (3) the presence of a primary amine group.
+Description: "The eNTRy rules are a set of three simple criteria for predicting compound
+  accumulation in gram-negative bacteria.\nThese rules were derived from a large dataset
+  of compound accumulation in Escherichia coli and have been shown\nto be effective
+  in guiding the design of compounds with improved permeability and accumulation in
+  gram-negative bacteria.\nThe eNTRy rules state that compounds are more likely to
+  accumulate in gram-negative bacteria if they possess the following\nproperties:
+  (1) a low globularity (≤ 0.25), (2) a low number of rotatable bonds (≤ 5), and (3)
+  the presence of a primary amine group."
 Deployment:
   - Local
 Source: Local
@@ -21,10 +23,10 @@ Output:
   - Score
 Output Dimension: 3
 Output Consistency: Fixed
-Interpretation: |
-  Three binary outputs indicating whether the compound meets each of the eNTRy rules, namely low globularity,
-  low number of rotatable bonds, and presence of a primary amine group. A value of 1 indicates that the compound
-  meets the respective criterion, while a value of 0 indicates that it does not.
+Interpretation: "Three binary outputs indicating whether the compound meets each of
+  the eNTRy rules, namely low globularity,\nlow number of rotatable bonds, and presence
+  of a primary amine group. A value of 1 indicates that the compound\nmeets the respective
+  criterion, while a value of 0 indicates that it does not."
 Tag:
   - Antimicrobial activity
 Biomedical Area:
@@ -36,3 +38,4 @@ Publication Year: 2017
 Publication: https://www.nature.com/articles/nature22308
 Source Code: https://github.com/HergenrotherLab/entry-cli
 License: GPL-3.0-or-later
+Incorporation Date: '2025-12-04'
