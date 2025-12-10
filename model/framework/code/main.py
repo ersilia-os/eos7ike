@@ -60,6 +60,9 @@ with open(bash_file, "w") as f:
 # run bash script and print output
 process = subprocess.Popen(f"bash {bash_file}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 stdout, stderr = process.communicate()
+if stdout:
+    print("Subprocess output:")
+    print(stdout)
 if stderr:
     print("Subprocess errors:")
     print(stderr)

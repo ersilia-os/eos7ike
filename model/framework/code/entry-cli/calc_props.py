@@ -6,8 +6,11 @@ import csv
 from openbabel import openbabel as ob
 from openbabel import pybel
 import numpy as np
+from standardiser import standardise
 from rdkit import Chem
 from rdkit.Chem import AllChem
+from rdkit import Chem
+from rdkit.Chem import rdForceFieldHelpers as FF
 ###############################
 
 __doc__="""Performs calculation of physiochemical properties of potential antibiotics. SMILES strings are parsed,
@@ -32,6 +35,41 @@ EMPTY_PROPERTIES = {
 }
 
 
+def applicability_domain_check(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    mol = Chem.rdmolops.RemoveSalts(mol)
+    
+    try:
+        mol = standardise.run(mol)
+    except:
+        mol = None
+    if mol is None:
+        return None
+    smiles = Chem.MolToSmiles(mol)
+    if "." in smiles:
+        return False
+    
+    def _is_metal_free(mol):
+        for atom in mol.GetAtoms():
+            if atom.GetAtomicNum() > 20 and atom.GetAtomicNum() != 34:
+                return False
+        return True
+    
+    def _is_too_large(mol, max_heavy_atoms=100):
+        heavy_atom_count = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() > 1)
+        return heavy_atom_count > max_heavy_atoms
+
+    if not _is_metal_free(mol):
+        return None
+    
+    if _is_too_large(mol):
+        return None
+    
+    return Chem.MolToSmiles(mol, canonical=True)
+
+
 def main():
     args = parse_args(sys.argv[1:])
     if(args.smiles):
@@ -48,14 +86,28 @@ def main():
         mols = parse_batch(args.batch_file)
         mols_to_write = []
         for smiles, name in mols:
-            try:
-                mol = smiles_to_ob(smiles)
-                properties = average_properties(mol)
-            except Exception as e:
+            smiles = applicability_domain_check(smiles)
+            if smiles is None:
                 properties = EMPTY_PROPERTIES
+            else:
+                try:
+                    mol = smiles_to_ob(smiles)
+                    properties = average_properties(mol)
+                except Exception as e:
+                    properties = EMPTY_PROPERTIES
             properties['smiles'] = name
             mols_to_write.append(properties)
         write_csv(mols_to_write, args.output)
+
+
+def uff_fails_and_why(mol):
+    if FF.UFFHasAllMoleculeParams(mol):
+        return False, []
+    bad = []
+    for a in mol.GetAtoms():
+        if a.GetAtomicNum() not in {1,5,6,7,8,9,14,15,16,17,33,34,35,53}:
+            bad.append((a.GetIdx(), a.GetSymbol(), a.GetAtomicNum()))
+    return True, bad
 
 
 def parse_args(arguments):
@@ -223,7 +275,7 @@ def initial_geom_guess(smiles):
     return Chem.MolToMolBlock(m2)
 
 
-def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=100000, energy_cutoff=50.0, confab_verbose=False):
+def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=10000, energy_cutoff=50.0, confab_verbose=False):
     """
     Generate ensemble of conformers to perform calculations on
 
@@ -240,12 +292,13 @@ def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=100000, energy_cutoff=50.0, con
     :return: list of conformers for a given molecule
     :rtype: openbabel.OBMol
     """
+    print("Generating conformers...")
     pff = ob.OBForceField_FindType( "mmff94" )
     pff.Setup(mol)
 
     pff.DiverseConfGen(rmsd_cutoff, conf_cutoff, energy_cutoff, confab_verbose)
 
-    pff.GetConformers(mol);
+    pff.GetConformers(mol)
 
     return mol
 

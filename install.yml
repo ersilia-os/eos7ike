@@ -2,3 +2,4 @@ python: "3.12"
 commands:
     - ["conda", "openbabel", "3.1.1", "conda-forge"]
     - ["pip", "rdkit", "2025.09.3"]
+    - ["pip", "standardiser", "0.1.9"]
