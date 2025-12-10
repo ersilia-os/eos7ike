@@ -39,7 +39,6 @@ def applicability_domain_check(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
-    mol = Chem.rdmolops.RemoveSalts(mol)
     
     try:
         mol = standardise.run(mol)
