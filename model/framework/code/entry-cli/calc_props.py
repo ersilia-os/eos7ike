@@ -22,6 +22,16 @@ FUNCTIONAL_GROUP_TO_SMARTS = {
 FUNCTIONAL_GROUPS = sorted(FUNCTIONAL_GROUP_TO_SMARTS.keys())
 
 
+EMPTY_PROPERTIES = {
+    "formula": None,
+    "molwt": None,
+    "rb": None,
+    "glob": None,
+    "pbf": None,
+    "primary_amine": None
+}
+
+
 def main():
     args = parse_args(sys.argv[1:])
     if(args.smiles):
@@ -38,8 +48,11 @@ def main():
         mols = parse_batch(args.batch_file)
         mols_to_write = []
         for smiles, name in mols:
-            mol = smiles_to_ob(smiles)
-            properties = average_properties(mol)
+            try:
+                mol = smiles_to_ob(smiles)
+                properties = average_properties(mol)
+            except Exception as e:
+                properties = EMPTY_PROPERTIES
             properties['smiles'] = name
             mols_to_write.append(properties)
         write_csv(mols_to_write, args.output)
@@ -199,7 +212,10 @@ def initial_geom_guess(smiles):
     m2 = Chem.AddHs(m)
 
     # Generate initial guess
-    AllChem.EmbedMolecule(m2, AllChem.ETKDG())
+    status = AllChem.EmbedMolecule(m2, AllChem.ETKDG())
+
+    if status != 0:
+        status = AllChem.EmbedMolecule(m2, useRandomCoords=True)
     AllChem.MMFFOptimizeMolecule(m2)
 
     # Write mol file

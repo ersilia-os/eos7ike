@@ -22,8 +22,6 @@ with open(input_file, "r") as f:
     next(reader)  # skip header
     smiles_list = [r[0] for r in reader]
 
-print(smiles_list)
-
 tmp_folder = tempfile.mkdtemp()
 tmp_folder = os.path.abspath("tmp")
 os.makedirs(tmp_folder, exist_ok=True)
@@ -62,8 +60,6 @@ with open(bash_file, "w") as f:
 # run bash script and print output
 process = subprocess.Popen(f"bash {bash_file}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 stdout, stderr = process.communicate()
-print("Subprocess output:")
-print(stdout)
 if stderr:
     print("Subprocess errors:")
     print(stderr)
@@ -76,24 +72,29 @@ with open(output_tmp, "r") as f:
     reader = csv.reader(f)
     next(reader)
     for r in reader:
-        rb_ = int(r[3])
-        glob_ = float(r[4])
-        pa_ = str(r[6])
-
-        if rb_ <= 5:
-            rb += [1]
+        if r[3] is None:
+            rb += [None]
+            glob += [None]
+            primary_amine += [None]
         else:
-            rb += [0]
+            rb_ = int(r[3])
+            glob_ = float(r[4])
+            pa_ = str(r[6])
 
-        if glob_ <= 0.25:
-            glob += [1]
-        else:
-            glob += [0]
+            if rb_ <= 5:
+                rb += [1]
+            else:
+                rb += [0]
 
-        if pa_ == "True":
-            primary_amine += [1]
-        else:
-            primary_amine += [0]
+            if glob_ <= 0.25:
+                glob += [1]
+            else:
+                glob += [0]
+
+            if pa_ == "True":
+                primary_amine += [1]
+            else:
+                primary_amine += [0]
 
 outputs = []
 for i in range(len(smiles_list)):
