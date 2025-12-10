@@ -209,6 +209,7 @@ def initial_geom_guess(smiles):
     ..todo: use openbabel for initial guess
     """
     m = Chem.MolFromSmiles(smiles)
+    Chem.SanitizeMol(m)
     m2 = Chem.AddHs(m)
 
     # Generate initial guess

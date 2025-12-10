@@ -72,7 +72,7 @@ with open(output_tmp, "r") as f:
     reader = csv.reader(f)
     next(reader)
     for r in reader:
-        if r[3] is None:
+        if r[3] is None or str(r[3]) == "":
             rb += [None]
             glob += [None]
             primary_amine += [None]
