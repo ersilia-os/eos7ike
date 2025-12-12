@@ -3,76 +3,30 @@ import argparse
 import os
 import sys
 import csv
+import numpy as np
 from openbabel import openbabel as ob
 from openbabel import pybel
-import numpy as np
-from standardiser import standardise
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit import Chem
-from rdkit.Chem import rdForceFieldHelpers as FF
 ###############################
 
 __doc__="""Performs calculation of physiochemical properties of potential antibiotics. SMILES strings are parsed,
-conformers are generated, and properties calculated. Properties include: chemical formula, molecular weight, rotatable
+conformers are generated using RDKit, and properties calculated. Properties include: chemical formula, molecular weight, rotatable
 bonds, globularity, and PBF.
 """
 
-
+# SMARTS definition for functional groups (using pybel.Smarts)
 FUNCTIONAL_GROUP_TO_SMARTS = {
     'primary_amine': pybel.Smarts('[$([N;H2;X3][CX4]),$([N;H3;X4+][CX4])]')
 }
 FUNCTIONAL_GROUPS = sorted(FUNCTIONAL_GROUP_TO_SMARTS.keys())
 
 
-EMPTY_PROPERTIES = {
-    "formula": None,
-    "molwt": None,
-    "rb": None,
-    "glob": None,
-    "pbf": None,
-    "primary_amine": None
-}
-
-
-def applicability_domain_check(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None
-    
-    try:
-        mol = standardise.run(mol)
-    except:
-        mol = None
-    if mol is None:
-        return None
-    smiles = Chem.MolToSmiles(mol)
-    if "." in smiles:
-        return False
-    
-    def _is_metal_free(mol):
-        for atom in mol.GetAtoms():
-            if atom.GetAtomicNum() > 20 and atom.GetAtomicNum() != 34:
-                return False
-        return True
-    
-    def _is_too_large(mol, max_heavy_atoms=100):
-        heavy_atom_count = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() > 1)
-        return heavy_atom_count > max_heavy_atoms
-
-    if not _is_metal_free(mol):
-        return None
-    
-    if _is_too_large(mol):
-        return None
-    
-    return Chem.MolToSmiles(mol, canonical=True)
-
-
 def main():
     args = parse_args(sys.argv[1:])
     if(args.smiles):
-        mol = smiles_to_ob(args.smiles)
+        # Use new RDKit-based function
+        mol = smiles_to_rdkit(args.smiles)
         properties = average_properties(mol)
         properties['smiles'] = args.smiles
         # A file will be written if command line option provide, otherwise write to stdout
@@ -85,28 +39,12 @@ def main():
         mols = parse_batch(args.batch_file)
         mols_to_write = []
         for smiles, name in mols:
-            smiles = applicability_domain_check(smiles)
-            if smiles is None:
-                properties = EMPTY_PROPERTIES
-            else:
-                try:
-                    mol = smiles_to_ob(smiles)
-                    properties = average_properties(mol)
-                except Exception as e:
-                    properties = EMPTY_PROPERTIES
+            # Use new RDKit-based function
+            mol = smiles_to_rdkit(smiles)
+            properties = average_properties(mol)
             properties['smiles'] = name
             mols_to_write.append(properties)
         write_csv(mols_to_write, args.output)
-
-
-def uff_fails_and_why(mol):
-    if FF.UFFHasAllMoleculeParams(mol):
-        return False, []
-    bad = []
-    for a in mol.GetAtoms():
-        if a.GetAtomicNum() not in {1,5,6,7,8,9,14,15,16,17,33,34,35,53}:
-            bad.append((a.GetIdx(), a.GetSymbol(), a.GetAtomicNum()))
-    return True, bad
 
 
 def parse_args(arguments):
@@ -118,7 +56,7 @@ def parse_args(arguments):
     group.add_argument("-s", "--smiles", dest="smiles", metavar="SMILES string", default=None)
     group.add_argument("-b", "--batch", dest="batch_file", metavar="Batch file", default=None)
     parser.add_argument("-o", "--output", dest="output", metavar="Output file", default=None,
-                        help="Defaults to csv file with same name as input")
+                         help="Defaults to csv file with same name as input")
 
     args = parser.parse_args(arguments)
     if not args.smiles and not args.batch_file:
@@ -135,9 +73,7 @@ def report_properties(properties):
     """
     Write out the results of physiochemical properties to stdout
 
-    :param smiles: SMILES string of input molecule
     :param properties: physiochemical properties to report
-    :type smiles: str
     :type properties: dict
     :return: None
     """
@@ -194,25 +130,49 @@ def write_csv(mols_to_write, filename):
 
 def average_properties(mol):
     """
-    Calculate all relevant properties for a given molecule averaged across conformers
+    Calculate all relevant properties for a given molecule averaged across conformers.
+    The molecule is an RDKit Mol object, which is converted to pybel/OpenBabel
+    for some property calculations (molwt, formula, rb, functional groups).
 
     :param mol: input molecule
-    :type mol: openbabel.OBMol
+    :type mol: rdkit.Chem.Mol
     :return: dictionary of properties
     :rtype dict
-
-    ..todo: remove reliance on pybel
     """
-    mols = run_confab(mol)
-    num_confs = mols.NumConformers()
+    # 1. Generate conformers using RDKit's ETKDG/MMFF
+    mol = run_confab(mol)
+    num_confs = mol.GetNumConformers()
+
+    if num_confs == 0:
+        print("Warning: No conformers generated. Cannot calculate 3D properties.")
+        return {
+            'formula': 'N/A', 'molwt': 0.0, 'rb': 0, 'glob': -1.0, 'pbf': -1.0,
+            **{fg: False for fg in FUNCTIONAL_GROUPS}
+        }
 
     globs = np.empty(num_confs)
     pbfs = np.empty(num_confs)
+
+    # 2. Bridge to pybel/OpenBabel for non-3D properties
+    # Convert the RDKit mol with conformers into a MolBlock, then read by OpenBabel
+    rdkit_mol_block = Chem.MolToMolBlock(mol, confId=-1) # -1 exports the structure (without conformer info needed here)
+    obmol = ob.OBMol()
+    obConv = ob.OBConversion()
+    obConv.SetInAndOutFormats("mol", "mol")
+    obConv.ReadString(obmol, rdkit_mol_block)
+    pymol = pybel.Molecule(obmol) # This pybel mol will be used for formula, molwt, rb, and smarts.
+
+    # 3. Iterate over RDKit Conformers for 3D properties
     for i in range(num_confs):
-        mols.SetConformer(i)
-        pymol = pybel.Molecule(mols)
-        # calculate properties
-        points = get_atom_coords(pymol)
+        conf = mol.GetConformer(i)
+
+        # Extract coordinates for the current RDKit conformer
+        points = np.empty(shape=(mol.GetNumAtoms(), 3))
+        for atom_idx in range(mol.GetNumAtoms()):
+            pos = conf.GetAtomPosition(atom_idx)
+            points[atom_idx] = (pos.x, pos.y, pos.z)
+
+        # calculate 3D properties
         globs[i] = calc_glob(points)
         pbfs[i] = calc_pbf(points)
 
@@ -224,82 +184,57 @@ def average_properties(mol):
         'pbf': np.mean(pbfs)
     }
 
+    # 4. Functional Groups
     for functional_group, smarts in FUNCTIONAL_GROUP_TO_SMARTS.items():
         data[functional_group] = has_functional_group(pymol, smarts)
 
     return data
 
 
-def smiles_to_ob(mol_string):
+def smiles_to_rdkit(mol_string):
     """
-    Reads a SMILES string and creates a molecule object
-
-    Currently, an initial guess at 3D geometry is performed by RDkit.
+    Reads a SMILES string and creates an RDKit molecule object with added Hydrogens.
+    This prepares the molecule for RDKit-based conformer generation.
 
     :param mol_string: SMILES string
     :type mol_string: str
-    :return: molecule object
-    :rtype: openbabel.OBMol
+    :return: RDKit molecule object with Hs
+    :rtype: rdkit.Chem.Mol
     """
-    mol = initial_geom_guess(mol_string)
-    obmol = ob.OBMol()
-    obConv = ob.OBConversion()
-    obConv.SetInAndOutFormats("mol", "mol")
-    obConv.ReadString(obmol, mol)
-    return obmol
+    m = Chem.MolFromSmiles(mol_string)
+    if m is None:
+        raise ValueError(f"Could not parse SMILES: {mol_string}")
+    m_with_h = Chem.AddHs(m)
+    return m_with_h
 
 
-def initial_geom_guess(smiles):
+def run_confab(mol, num_confs=50, max_attempts=500, prune_rms=0.5):
     """
-    Parses a SMILES string and performs an initial guess of geometry
+    Generate ensemble of conformers using RDKit's ETKDG method followed by MMFF optimization.
 
-    :param smiles: SMILES structure string
-    :return: String with Mol structure text
-    :rtype: str
-
-    ..todo: use openbabel for initial guess
+    :param mol: initial molecule (RDKit Mol) to generate conformers from
+    :param num_confs: max number of conformers to generate
+    :param max_attempts: max attempts for embedding
+    :param prune_rms: RMSD cutoff for pruning redundant conformers, default: 0.5
+    :type mol: rdkit.Chem.Mol
+    :type num_confs: int
+    :type prune_rms: float
+    :return: molecule object with generated and minimized conformers
+    :rtype: rdkit.Chem.Mol
     """
-    m = Chem.MolFromSmiles(smiles)
-    Chem.SanitizeMol(m)
-    m2 = Chem.AddHs(m)
+    # 1. Generate conformers using RDKit's ETKDG method
+    # 
+    cids = AllChem.EmbedMultipleConfs(mol, numConfs=num_confs, maxAttempts=max_attempts,
+                                     pruneRmsThresh=prune_rms, randomSeed=42)
 
-    # Generate initial guess
-    status = AllChem.EmbedMolecule(m2, AllChem.ETKDG())
+    # 2. Perform energy minimization for each conformer using MMFF
+    minimized_mol = Chem.Mol(mol)
+    for cid in cids:
+        # Use MMFF for minimization
+        AllChem.MMFFOptimizeMolecule(minimized_mol, confId=int(cid))
 
-    if status != 0:
-        status = AllChem.EmbedMolecule(m2, useRandomCoords=True)
-    AllChem.MMFFOptimizeMolecule(m2)
+    return minimized_mol
 
-    # Write mol file
-    return Chem.MolToMolBlock(m2)
-
-
-def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=10000, energy_cutoff=50.0, confab_verbose=False):
-    """
-    Generate ensemble of conformers to perform calculations on
-
-    :param mol: initial molecule to generate conformers from
-    :param rmsd_cutoff: similarity threshold for conformers, default: 0.5
-    :param conf_cutoff: max number of conformers to generate, default: 100,000
-    :param energy_cutoff: max relative energy between conformers, default: 50
-    :param confab_verbose: whether confab should report on rotors
-    :type mol: openbabel.OBMol
-    :type rmsd_cutoff: float
-    :type conf_cutoff: int
-    :type energy_cutoff: float
-    :type confab_verbose: bool
-    :return: list of conformers for a given molecule
-    :rtype: openbabel.OBMol
-    """
-    print("Generating conformers...")
-    pff = ob.OBForceField_FindType( "mmff94" )
-    pff.Setup(mol)
-
-    pff.DiverseConfGen(rmsd_cutoff, conf_cutoff, energy_cutoff, confab_verbose)
-
-    pff.GetConformers(mol)
-
-    return mol
 
 def calc_glob(points):
     """
@@ -313,7 +248,7 @@ def calc_glob(points):
     :return: globularity of molecule
     :rtype: float | int
     """
-    if points is None:
+    if points is None or points.shape[0] < 3:
         return 0
     points = points.T
 
@@ -325,10 +260,11 @@ def calc_glob(points):
     vals = np.sort(vals)[::-1]
 
     # glob is ratio of last eigenvalue and first eigenvalue
-    if vals[0] != 0:
+    # Globularity = lambda_3 / lambda_1
+    if vals[0] > 1e-6: # Check for near-zero to avoid division by zero
         return vals[-1]/vals[0]
     else:
-        return -1
+        return 0
 
 
 def calc_pbf(points):
@@ -404,8 +340,10 @@ def is_rotor(bond, include_amides=False):
     # Don't count single bonds adjacent to triple bonds, still want to count the triple bond
     if (bond.GetBeginAtom().GetHyb() == 1) != (bond.GetEndAtom().GetHyb() == 1): return False
 
-    # Cannot be terminal
+    # Cannot be terminal (must be heavy atom degree > 1 on both sides)
     if bond.GetBeginAtom().GetHvyDegree() > 1 and bond.GetEndAtom().GetHvyDegree() > 1: return True
+    
+    return False
 
 
 def calc_avg_dist(points, C, N):
@@ -417,26 +355,11 @@ def calc_avg_dist(points, C, N):
     :param N: normal vector of plane
     :return Average distance of each atom from the best-fit plane
     """
-    sum = 0
+    sum_dist = 0
     for xyz in points:
-        sum += abs(distance(xyz, C, N))
-    return sum / len(points)
+        sum_dist += abs(distance(xyz, C, N))
+    return sum_dist / len(points)
 
-def get_atom_coords(mol):
-    """
-    Retrieve the 3D coordinates of all atoms in a molecules
-
-    :param mol: pybel molecule object
-    :return numpy array of coordinates
-    """
-    num_atoms = len(mol.atoms)
-    pts = np.empty(shape = (num_atoms,3))
-    atoms = mol.atoms
-
-    for a in range(num_atoms):
-        pts[a] = atoms[a].coords
-
-    return pts
 
 def svd_fit(X):
     """
@@ -444,19 +367,6 @@ def svd_fit(X):
     Find (n - 1) dimensional standard (e.g. line in 2 dimension, plane in 3
     dimension, hyperplane in n dimension) via solving Singular Value
     Decomposition.
-    The idea was explained in the following references
-    - http://www.caves.org/section/commelect/DUSI/openmag/pdf/SphereFitting.pdf
-    - http://www.geometrictools.com/Documentation/LeastSquaresFitting.pdf
-    - http://www.ime.unicamp.br/~marianar/MI602/material%20extra/svd-regression-analysis.pdf
-
-    :Example:
-        >>> XY = [[0, 1], [3, 3]]
-        >>> XY = np.array(XY)
-        >>> C, N = svd_fit(XY)
-        >>> C
-        array([ 1.5,  2. ])
-        >>> N
-        array([-0.5547002 ,  0.83205029])
 
     :param X:n x m dimensional matrix which n indicate the number of the dimension and m indicate the number of points
     :return [C, N] where C is a centroid vector and N is a normal vector
@@ -478,11 +388,10 @@ def distance(x, C, N):
     """
     Calculate an orthogonal distance between the points and the standard
     Args:
-    :param x: n x m dimensional matrix
-    :param C: n dimensional vector whicn indicate the centroid of the standard
+    :param x: n dimensional vector (atom coordinates)
+    :param C: n dimensional vector which indicate the centroid of the standard
     :param N: n dimensional vector which indicate the normal vector of the standard
-    :return m dimensional vector which indicate the orthogonal distance. the value
-            will be negative if the points beside opposite side of the normal vector
+    :return orthogonal distance
     """
     return np.dot(x - C, N)
 
