@@ -274,7 +274,7 @@ def initial_geom_guess(smiles):
     return Chem.MolToMolBlock(m2)
 
 
-def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=10000, energy_cutoff=50.0, confab_verbose=False):
+def run_confab(mol, rmsd_cutoff=0.5, conf_cutoff=1000, energy_cutoff=50.0, confab_verbose=False):
     """
     Generate ensemble of conformers to perform calculations on
 
