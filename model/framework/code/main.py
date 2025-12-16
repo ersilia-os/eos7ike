@@ -23,7 +23,6 @@ with open(input_file, "r") as f:
     smiles_list = [r[0] for r in reader]
 
 tmp_folder = tempfile.mkdtemp()
-tmp_folder = os.path.abspath("tmp")
 os.makedirs(tmp_folder, exist_ok=True)
 input_tmp = os.path.join(tmp_folder, "input.smi")
 with open(input_tmp, "w") as f:
