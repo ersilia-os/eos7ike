@@ -140,10 +140,13 @@ def average_properties(mol):
     :rtype dict
     """
     # 1. Generate conformers using RDKit's ETKDG/MMFF
-    mol = run_confab(mol)
-    num_confs = mol.GetNumConformers()
+    try:
+        mol = run_confab(mol)
+        num_confs = mol.GetNumConformers()
+    except:
+        mol = None
 
-    if num_confs == 0:
+    if mol is None or num_confs == 0:
         print("Warning: No conformers generated. Cannot calculate 3D properties.")
         return {
             'formula': 'N/A', 'molwt': 0.0, 'rb': 0, 'glob': -1.0, 'pbf': -1.0,
