@@ -6,7 +6,7 @@ to be effective in guiding the design of compounds with improved permeability an
 The eNTRy rules state that compounds are more likely to accumulate in gram-negative bacteria if they possess the following
 properties: (1) a low globularity (≤ 0.25), (2) a low number of rotatable bonds (≤ 5), and (3) the presence of a primary amine group.
 
-This model was incorporated on 2025-12-04.Last packaged on 2025-12-16.
+This model was incorporated on 2025-12-04.Last packaged on 2025-12-19.
 
 ## Information
 ### Identifiers
@@ -52,8 +52,8 @@ Below are the **Output Columns** of the model:
 - **Image Size (Mb):** `765.44`
 
 **Computational Performance (seconds):**
-- 10 inputs: `28.4`
-- 100 inputs: `456.64`
+- 10 inputs: `29.12`
+- 100 inputs: `448.16`
 - 10000 inputs: `-1`
 
 ### References
