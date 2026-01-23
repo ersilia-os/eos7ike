@@ -39,7 +39,7 @@ Publication: https://www.nature.com/articles/nature22308
 Source Code: https://github.com/HergenrotherLab/entry-cli
 License: GPL-3.0-or-later
 Incorporation Date: '2025-12-04'
-Last Packaging Date: '2025-12-19'
+Last Packaging Date: '2026-01-23'
 Release: v1.0.0
 S3: https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos7ike.zip
 DockerHub: https://hub.docker.com/r/ersiliaos/eos7ike
@@ -48,9 +48,9 @@ Docker Architecture:
   - ARM64
 Model Size: 1.0
 Environment Size: 620.0
-Image Size: 765.44
-Computational Performance 1: 29.12
-Computational Performance 2: 46.54
-Computational Performance 3: 448.16
+Image Size: 765.49
+Computational Performance 1: 29.13
+Computational Performance 2: 46.88
+Computational Performance 3: 452.73
 Computational Performance 4: -1.0
 Computational Performance 5: -1.0
