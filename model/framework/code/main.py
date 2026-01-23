@@ -33,10 +33,9 @@ output_tmp = os.path.join(tmp_folder, "output.csv")
 
 bash_file = os.path.join(tmp_folder, "run_model.sh")
 bash_content = f"""
-{python_executable} -c "import site; print(site.getsitepackages()[0])"
 
-SITEPKG=$({python_executable} -c "import site; print(site.getsitepackages()[0])")
-cat > "$SITEPKG/sitecustomize.py" <<'PY'
+PATCHDIR="{tmp_folder}"
+cat > "$PATCHDIR/sitecustomize.py" <<'PY'
 try:
     from openbabel import openbabel as ob
     # Provide legacy symbol expected by old code:
@@ -49,7 +48,7 @@ except Exception:
     # Don't break interpreter startup if openbabel isn't installed in some envs
     pass
 PY
-
+export PYTHONPATH="$PATCHDIR:$PYTHONPATH"
 {python_executable} {root}/entry-cli/calc_props.py -b {input_tmp} -o {output_tmp}
 """
 
