@@ -41,7 +41,7 @@ License: GPL-3.0-or-later
 Contributor: miquelduranfrigola
 Incorporation Date: '2025-12-04'
 Last Packaging Date: '2026-01-23'
-Release: v1.0.0
+Release: v1.1.0
 S3: https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos7ike.zip
 DockerHub: https://hub.docker.com/r/ersiliaos/eos7ike
 Docker Architecture:
