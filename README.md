@@ -58,7 +58,7 @@ Below are the **Output Columns** of the model:
 
 ### References
 - **Source Code**: [https://github.com/HergenrotherLab/entry-cli](https://github.com/HergenrotherLab/entry-cli)
-- **Publication**: [https://www.nature.com/articles/nature22308](https://www.nature.com/articles/nature22308)
+- **Publication**: [https://doi.org/10.1038/nature22308](https://doi.org/10.1038/nature22308)
 - **Publication Type:** `Peer reviewed`
 - **Publication Year:** `2017`
 - **Ersilia Contributor:** [miquelduranfrigola](https://github.com/miquelduranfrigola)
