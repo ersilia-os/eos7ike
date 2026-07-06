@@ -1,10 +1,6 @@
 # Entry-way rules (eNTRy) for gram-negative bacteria
 
-The eNTRy rules are a set of three simple criteria for predicting compound accumulation in gram-negative bacteria.
-These rules were derived from a large dataset of compound accumulation in Escherichia coli and have been shown
-to be effective in guiding the design of compounds with improved permeability and accumulation in gram-negative bacteria.
-The eNTRy rules state that compounds are more likely to accumulate in gram-negative bacteria if they possess the following
-properties: (1) a low globularity (≤ 0.25), (2) a low number of rotatable bonds (≤ 5), and (3) the presence of a primary amine group.
+The eNTRy rules are three criteria for predicting drug accumulation in Gram-negative bacteria, derived from an E. coli dataset to guide the design of compounds with improved permeability. Compounds are more likely to accumulate if they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5), and (3) a primary amine group."
 
 This model was incorporated on 2025-12-04.Last packaged on 2026-01-23.
 
