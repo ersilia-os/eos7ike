@@ -2,7 +2,7 @@
 
 The eNTRy rules are three criteria for predicting drug accumulation in Gram-negative bacteria, derived from an E. coli dataset to guide the design of compounds with improved permeability. Compounds are more likely to accumulate if they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5), and (3) a primary amine group.
 
-This model was incorporated on 2025-12-04.Last packaged on 2026-01-23.
+This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 
 ## Information
 ### Identifiers
@@ -45,11 +45,11 @@ Below are the **Output Columns** of the model:
 ### Resource Consumption
 - **Model Size (Mb):** `1`
 - **Environment Size (Mb):** `624`
-- **Image Size (Mb):** `765.49`
+- **Image Size (Mb):** `765.27`
 
 **Computational Performance (seconds):**
-- 10 inputs: `29.13`
-- 100 inputs: `452.73`
+- 10 inputs: `33.29`
+- 100 inputs: `363.06`
 - 10000 inputs: `-1`
 
 ### References
