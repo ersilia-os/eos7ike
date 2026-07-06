@@ -2,7 +2,8 @@ Identifier: eos7ike
 Slug: entry-rules
 Status: In maintenance
 Title: Entry-way rules (eNTRy) for gram-negative bacteria
-Description: "The eNTRy rules are three criteria for predicting drug accumulation in Gram-negative bacteria, derived from an E. coli dataset to guide the design of compounds with improved permeability. Compounds are more likely to accumulate if they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5), and (3) a primary amine group."
+Description: |
+  The eNTRy rules are three criteria for predicting drug accumulation in Gram-negative bacteria, derived from an E. coli dataset to guide the design of compounds with improved permeability. Compounds are more likely to accumulate if they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5), and (3) a primary amine group."
 Deployment:
   - Local
 Source: Local
