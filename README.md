@@ -1,6 +1,6 @@
 # Entry-way rules (eNTRy) for gram-negative bacteria
 
-The eNTRy rules are three criteria for predicting drug accumulation in Gram-negative bacteria, derived from an E. coli dataset to guide the design of compounds with improved permeability. Compounds are more likely to accumulate if they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5), and (3) a primary amine group.
+Applies the three eNTRy rules, checking whether a compound carries a primary amine, stays rigid with few rotatable bonds, and remains flat rather than globular. Richter and co-workers derived the criteria from accumulation measurements in Escherichia coli, then demonstrated their prospective value by converting deoxynybomycin, previously active only against Gram-positive organisms, into a compound with broad Gram-negative activity. The rules are structural filters, and meeting all three raises the odds of accumulation without guaranteeing antibacterial effect.
 
 This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 
@@ -23,7 +23,7 @@ This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 ### Output
 - **Output Dimension:** `3`
 - **Output Consistency:** `Fixed`
-- **Interpretation:** Three binary outputs indicating whether the compound meets each of the eNTRy rules, namely low globularity,
+- **Interpretation:** Binary indicators of whether the compound satisfies each eNTRy rule, where 1 means the criterion is met.
 low number of rotatable bonds, and presence of a primary amine group. A value of 1 indicates that the compound
 meets the respective criterion, while a value of 0 indicates that it does not.
 
@@ -60,7 +60,7 @@ Below are the **Output Columns** of the model:
 - **Ersilia Contributor:** [miquelduranfrigola](https://github.com/miquelduranfrigola)
 
 ### License
-This package is licensed under a [GPL-3.0](https://github.com/ersilia-os/ersilia/blob/master/LICENSE) license. The model contained within this package is licensed under a [GPL-3.0-or-later](LICENSE) license.
+This package is licensed under a [GPL-3.0](https://github.com/ersilia-os/ersilia/blob/master/LICENSE) license. The model contained within this package is licensed under a [NCSA](LICENSE) license.
 
 **Notice**: Ersilia grants access to models _as is_, directly from the original authors, please refer to the original code repository and/or publication if you use the model in your research.
 
