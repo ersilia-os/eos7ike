@@ -2,7 +2,11 @@ Identifier: eos7ike
 Slug: entry-rules
 Status: Ready
 Title: Entry-way rules (eNTRy) for gram-negative bacteria
-Description: 'Applies the three eNTRy rules, checking whether a compound carries a primary amine, stays rigid with few rotatable bonds, and remains flat rather than globular. Richter and co-workers derived the criteria from accumulation measurements in Escherichia coli, then demonstrated their prospective value by converting deoxynybomycin, previously active only against Gram-positive organisms, into a compound with broad Gram-negative activity. The rules are structural filters, and meeting all three raises the odds of accumulation without guaranteeing antibacterial effect.'
+Description: 'The eNTRy rules are three criteria for predicting drug accumulation
+  in Gram-negative bacteria, derived from an E. coli dataset to guide the design of
+  compounds with improved permeability. Compounds are more likely to accumulate if
+  they possess: (1) low globularity ($\le$ 0.25), (2) few rotatable bonds ($\le$ 5),
+  and (3) a primary amine group.'
 Deployment:
   - Local
 Source: Local
@@ -16,7 +20,10 @@ Output:
   - Score
 Output Dimension: 3
 Output Consistency: Fixed
-Interpretation: "Binary indicators of whether the compound satisfies each eNTRy rule, where 1 means the criterion is met."
+Interpretation: "Three binary outputs indicating whether the compound meets each of
+  the eNTRy rules, namely low globularity,\nlow number of rotatable bonds, and presence
+  of a primary amine group. A value of 1 indicates that the compound\nmeets the respective
+  criterion, while a value of 0 indicates that it does not."
 Tag:
   - Antimicrobial activity
 Biomedical Area:
