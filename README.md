@@ -1,6 +1,6 @@
 # Entry-way rules (eNTRy) for gram-negative bacteria
 
-Applies the three eNTRy rules, checking whether a compound carries a primary amine, stays rigid with few rotatable bonds, and remains flat rather than globular. Richter and co-workers derived the criteria from accumulation measurements in Escherichia coli, then demonstrated their prospective value by converting deoxynybomycin, previously active only against Gram-positive organisms, into a compound with broad Gram-negative activity. The rules are structural filters, and meeting all three raises the odds of accumulation without guaranteeing antibacterial effect.
+Applies the three eNTRy rules, checking whether a compound carries a primary amine, has five or fewer rotatable bonds, and has a globularity of 0.25 or less. Richter and co-workers derived the criteria from accumulation measurements in Escherichia coli, then demonstrated their prospective value by converting deoxynybomycin, previously active only against Gram-positive organisms, into a compound with broad Gram-negative activity. The rules are structural filters, and meeting all three raises the odds of accumulation without guaranteeing antibacterial effect.
 
 This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 
@@ -23,7 +23,7 @@ This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 ### Output
 - **Output Dimension:** `3`
 - **Output Consistency:** `Fixed`
-- **Interpretation:** Binary indicators of whether the compound satisfies each eNTRy rule, where 1 means the criterion is met.
+- **Interpretation:** Three pass or fail flags for primary amine, five or fewer rotatable bonds, and globularity at most 0.25.
 low number of rotatable bonds, and presence of a primary amine group. A value of 1 indicates that the compound
 meets the respective criterion, while a value of 0 indicates that it does not.
 
