@@ -2,7 +2,8 @@
 
 Applies the three eNTRy rules, checking whether a compound carries a primary amine, has five or fewer rotatable bonds, and has a globularity of 0.25 or less. Richter and co-workers derived the criteria from accumulation measurements in Escherichia coli, then demonstrated their prospective value by converting deoxynybomycin, previously active only against Gram-positive organisms, into a compound with broad Gram-negative activity. The rules are structural filters, and meeting all three raises the odds of accumulation without guaranteeing antibacterial effect.
 
-This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
+This model was incorporated on 2025-12-04.
+Last packaged on 2026-07-06.
 
 ## Information
 ### Identifiers
@@ -24,8 +25,6 @@ This model was incorporated on 2025-12-04.Last packaged on 2026-07-06.
 - **Output Dimension:** `3`
 - **Output Consistency:** `Fixed`
 - **Interpretation:** Three pass or fail flags for primary amine, five or fewer rotatable bonds, and globularity at most 0.25.
-low number of rotatable bonds, and presence of a primary amine group. A value of 1 indicates that the compound
-meets the respective criterion, while a value of 0 indicates that it does not.
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
@@ -41,6 +40,7 @@ Below are the **Output Columns** of the model:
 - **DockerHub**: [https://hub.docker.com/r/ersiliaos/eos7ike](https://hub.docker.com/r/ersiliaos/eos7ike)
 - **Docker Architecture:** `AMD64`, `ARM64`
 - **S3 Storage**: [https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos7ike.zip](https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos7ike.zip)
+- **Apptainer**: [https://models-sif.s3.eu-north-1.amazonaws.com/eos7ike_v1.sif](https://models-sif.s3.eu-north-1.amazonaws.com/eos7ike_v1.sif)
 
 ### Resource Consumption
 - **Model Size (Mb):** `1`
